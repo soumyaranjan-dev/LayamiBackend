@@ -11,6 +11,6 @@ publicRouter.post("/signup", signupPublic)
 
 
 // signin route
-publicRouter.get("/signin", signinPublic)
+publicRouter.post("/signin", signinPublic)
 
 module.exports = publicRouter

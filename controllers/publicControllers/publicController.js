@@ -1,3 +1,4 @@
+require("dotenv").config()
 const USER = require("../../models/userModel/userModel")
 const jwttoken = require("jsonwebtoken")
 
@@ -26,7 +27,7 @@ const signinPublic = async (req, res) => {
         const exists = await USER.findOne({ userEmail })
         if (!exists) return res.status(201).json({ message: "User not Exists! Try Another" })
         
-        const token = jwttoken.sign({userEmail}, process.env.PRIVATE_KEY,{expiresIn: "1hr"})
+        const token = jwttoken.sign({ userEmail }, process.env.PRIVATE_KEY,{expiresIn: "1hr"})
         res.status(200).json({ message: "Good Signin!", token })
     } catch (error) {
         console.log(error)
