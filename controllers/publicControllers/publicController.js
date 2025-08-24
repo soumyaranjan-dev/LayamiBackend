@@ -1,6 +1,8 @@
 require("dotenv").config()
+const sendEmail = require("../../config/email/email")
 const USER = require("../../models/userModel/userModel")
 const jwttoken = require("jsonwebtoken")
+const bcrypt = require("bcrypt")
 
 const defaultPublic = (req, res) => {
     res.json({ message: "default public route" })
@@ -8,26 +10,37 @@ const defaultPublic = (req, res) => {
 
 const signupPublic = async (req, res) => {
     const userRegData = req.body
-    const { userEmail } = userData
+    const { userName, userEmail } = userRegData
     try {
         const exists = await USER.findOne({ userEmail })
         if (exists) return res.status(201).json({ message: "Email Exists! Try Another" })
-        await USER.create(userData)
-        res.status(200).json({message: "Good Signup!"})
+
+        const otp = userName.slice(1, 3) + userEmail.slice(1, 3) + "001"
+        const hashedOtp = await bcrypt.hash(otp, 10)
+
+        const finalRegUser = { ...userRegData, userRole: "user", userPass: hashedOtp }
+        await USER.create(finalRegUser)
+
+        sendEmail(userEmail, "registrered ✅", `Welcome to onboard. \nHere is your otp: ${otp}`)
+        res.status(200).json({ message: "Good Signup!" })
     } catch (error) {
         console.log(error)
-        res.status(500).json({message: "Internal Error!"})
+        res.status(500).json({ message: "Internal Error!" })
     }
 }
 
 const signinPublic = async (req, res) => {
     const userLogData = req.body
-    const {userEmail} = userLogData
+    const { userEmail, userPass } = userLogData
     try {
         const exists = await USER.findOne({ userEmail })
         if (!exists) return res.status(201).json({ message: "User not Exists! Try Another" })
-        
-        const token = jwttoken.sign({ userEmail }, process.env.PRIVATE_KEY,{expiresIn: "1hr"})
+
+        const validate = await bcrypt.compare(userPass, exists.userPass)
+        if (!validate) return res.status(201).json({ message: "Incorrect Password" })
+
+        const token = jwttoken.sign({ userEmail }, process.env.PRIVATE_KEY, { expiresIn: "1h" })
+
         res.status(200).json({ message: "Good Signin!", token })
     } catch (error) {
         console.log(error)
@@ -35,4 +48,21 @@ const signinPublic = async (req, res) => {
     }
 }
 
-module.exports = {defaultPublic, signupPublic, signinPublic}
+const updatePass = async (req, res) => {
+    const userLogData = req.body
+    const { userEmail, userPass } = userLogData
+    try {
+        const exists = await USER.findOne({ userEmail })
+        if (!exists) return res.status(201).json({ message: "User not Exists! Try Another" })
+
+        const hashedPass = await bcrypt.hash(userPass, 10)
+        exists.userPass = hashedPass
+        await exists.save()
+        
+        sendEmail(userEmail, "Password Reseted 🪶", `You password is Reseted.`)
+        res.status(201).json({ message: "password reseted." })
+    } catch (error) {
+        res.status(500).json({ message: "" })
+    }
+}
+module.exports = { defaultPublic, signupPublic, signinPublic, updatePass }

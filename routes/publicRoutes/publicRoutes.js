@@ -1,5 +1,4 @@
-const { defaultPublic, signupPublic, signinPublic } = require("../../controllers/publicControllers/publicController")
-const USER = require("../../models/userModel/userModel")
+const { defaultPublic, signupPublic, signinPublic, updatePass } = require("../../controllers/publicControllers/publicController")
 
 const publicRouter = require("express").Router()
 
@@ -9,8 +8,10 @@ publicRouter.get("/", defaultPublic)
 // signup route
 publicRouter.post("/signup", signupPublic)
 
-
 // signin route
 publicRouter.post("/signin", signinPublic)
+
+// update pass route
+publicRouter.post("/updatePass", updatePass)
 
 module.exports = publicRouter
