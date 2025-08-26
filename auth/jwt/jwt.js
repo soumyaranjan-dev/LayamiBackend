@@ -1,11 +1,11 @@
 const jwttoken = require("jsonwebtoken")
-const USER = require("../../models/userModel/userModel")
+
 
 const doVerifyToken = async (req, res, next) => {
     try {
         const token = req.headers.authorization?.split(" ")[1]
         if (!token) return res.status(201).json({ message: "token not present" })
-
+        // console.log(typeof token)
         jwttoken.verify(token, process.env.PRIVATE_KEY, (err, user) => {
             if (err) return res.status(201).json({ message: "invalid token" })
             req.user = user

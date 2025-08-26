@@ -1,9 +1,16 @@
+const SONG = require("../../models/songModel/songModel")
+
 const defaultUser = (req, res) => {
     res.json({ message: "default user route" })
 }
 
-const getAllSongs = async (req, res) => {
-    res.json({message: "got all songs"})
+const getSongs = async (req, res) => {
+    try {
+        const songs = await SONG.find()
+        res.json({ message: "got all songs",songs})
+    } catch (error) {
+        res.json({error})
+    }
 }
 
-module.exports = {defaultUser, getAllSongs}
+module.exports = {defaultUser, getSongs}

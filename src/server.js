@@ -1,9 +1,12 @@
 require("dotenv").config()
 const express = require("express")
+const cors = require("cors")
 const publicRouter = require("../routes/publicRoutes/publicRoutes")
 const connectDB = require("../config/db/mongodb")
 const userRouter = require("../routes/userRoutes/userRoutes")
 const adminRouter = require("../routes/adminRoutes/adminRoutes")
+const cloudinary = require("../config/cloudinary/cloudinary")
+
 const app = express()
 
 // port
@@ -14,6 +17,7 @@ connectDB()
 
 // middlewares
 app.use(express.json())
+app.use(cors())
 
 // server testing
 app.get("/", (req, res) => {

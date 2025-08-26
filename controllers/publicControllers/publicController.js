@@ -15,13 +15,13 @@ const signupPublic = async (req, res) => {
         const exists = await USER.findOne({ userEmail })
         if (exists) return res.status(201).json({ message: "Email Exists! Try Another" })
 
-        const otp = userName.slice(1, 3) + userEmail.slice(1, 3) + "001"
+        const otp = userName.slice(0, 3) + userEmail.slice(0, 3) + "001"
         const hashedOtp = await bcrypt.hash(otp, 10)
 
         const finalRegUser = { ...userRegData, userRole: "user", userPass: hashedOtp }
         await USER.create(finalRegUser)
 
-        sendEmail(userEmail, "registrered ✅", `Welcome to onboard. \nHere is your otp: ${otp}`)
+        sendEmail(userEmail, "registrered ✅", `Welcome to onboard. \nHere is your One Time Password: ${otp}`)
         res.status(200).json({ message: "Good Signup!" })
     } catch (error) {
         console.log(error)
@@ -50,12 +50,12 @@ const signinPublic = async (req, res) => {
 
 const updatePass = async (req, res) => {
     const userLogData = req.body
-    const { userEmail, userPass } = userLogData
+    const { userEmail, newPass } = userLogData
     try {
         const exists = await USER.findOne({ userEmail })
         if (!exists) return res.status(201).json({ message: "User not Exists! Try Another" })
 
-        const hashedPass = await bcrypt.hash(userPass, 10)
+        const hashedPass = await bcrypt.hash(newPass, 10)
         exists.userPass = hashedPass
         await exists.save()
         
