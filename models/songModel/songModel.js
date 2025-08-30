@@ -2,11 +2,11 @@ const { default: mongoose } = require("mongoose");
 
 const songSchema = new mongoose.Schema({
     songId: String,
-    artistId: String,
+    cloudinaryUrl: String,
     cover: String,
     title: String,
-    duration: Number,
-    createdAt: { type: Date, default: Date.now }
+    duration: String,
+    createdAt: Date
 });
 
 const SONG = mongoose.model("layami_song", songSchema)
