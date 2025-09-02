@@ -14,8 +14,6 @@ const addSong = async (req, res) => {
             folder: "songs"
         })
 
-        // console.log(result)
-
         const songObj = {
             songId: result.public_id,
             cloudinaryUrl: result.secure_url,
@@ -24,9 +22,8 @@ const addSong = async (req, res) => {
             duration: formatDuration(result.duration),
             createdAt: result.created_at
         }
-        console.log(songObj)
+        
         await SONG.create(songObj)
-
         await fs.promises.unlink(req.file.path)
         res.json({ message: "song is addded", cloudinaryUrl: result.secure_url })
     } catch (error) {
