@@ -3,8 +3,9 @@ const fs = require("fs")
 const SONG = require("../../models/songModel/songModel")
 const formatDuration = require("../../utils/formatDuration/formatDuration")
 
-const defaultAdmin = (req, res) => {
-    res.json({ message: "default admin route" })
+const defaultAdmin = async (req, res) => {
+    const result = await SONG.find()
+    res.json({result})
 }
 
 const addSong = async (req, res) => {
@@ -13,7 +14,7 @@ const addSong = async (req, res) => {
             resource_type: "video",
             folder: "songs"
         })
-
+ 
         const songObj = {
             songId: result.public_id,
             cloudinaryUrl: result.secure_url,
@@ -22,7 +23,7 @@ const addSong = async (req, res) => {
             duration: formatDuration(result.duration),
             createdAt: result.created_at
         }
-        
+       
         await SONG.create(songObj)
         await fs.promises.unlink(req.file.path)
         res.json({ message: "song is addded", cloudinaryUrl: result.secure_url })
